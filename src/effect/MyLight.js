@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { EventBus } from '@/effect/EventBus'
 
 /**
  * 
@@ -17,6 +18,16 @@ export class MyLight {
 
     this.createSportL()
     this.createCarDL()
+    EventBus.getInstance().on('changeSky', sceneName => {
+      if (this.nowSceneName === sceneName) return
+      if (sceneName === '展厅') {
+        this.createSportL()
+      } else if (sceneName === '户外') {
+        this.removeSportL()
+      }
+
+      this.nowSceneName = sceneName // 把当前点击的场景名字保存一下
+    })
   }
   createCarDL () {
     this.dirPosList.forEach(m => {
@@ -38,5 +49,10 @@ export class MyLight {
     this.nowSpotLight.shadow.mapSize.set(4096, 4096) // 阴影贴图大小宽高
     this.nowSpotLight.position.set(0, 5, 0)
     this.scene.add(this.nowSpotLight)
+  }
+  // 删除聚光灯
+  removeSportL () {
+    this.nowSpotLight.parent.remove(this.nowSpotLight)
+    this.nowSpotLight = {}
   }
 }
